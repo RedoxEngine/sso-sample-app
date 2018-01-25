@@ -53,7 +53,7 @@ func main() {
 	check(err)
 	templ = template.Must(template.New("home").Parse(string(homeTemplate)))
 	if baseURL == "" {
-		baseURL = "http://localhost:"
+		baseURL = "http://localhost" + port
 	}
 
 	startServer()

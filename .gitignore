@@ -2,3 +2,9 @@
 **/*
 !**/*.go
 !**/
+!Dockerfile
+!Makefile
+!app.json
+!README.md
+!heroku.yml
+!templates/*.tmpl 

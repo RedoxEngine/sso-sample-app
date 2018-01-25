@@ -1,0 +1,12 @@
+{
+  "name": "Redox SSO sample App",
+  "description": "Sample Application that receives the Redox SSO Data Model",
+  "keywords": [
+    "redox",
+    "go",
+    "sample",
+    "app"
+  ],
+  "website": "https://github.com/RedoxEngine/sso-sample-app",
+  "repository": "https://github.com/RedoxEngine/sso-sample-app"
+}

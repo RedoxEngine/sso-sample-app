@@ -15,6 +15,7 @@ import (
 
 var templ *template.Template
 var baseURL = string(os.Getenv("BASE_URL"))
+var port = os.Getenv("PORT")
 
 // RedoxIds represents patient Identifiers
 type RedoxIds struct {
@@ -52,13 +53,18 @@ func main() {
 	check(err)
 	templ = template.Must(template.New("home").Parse(string(homeTemplate)))
 	if baseURL == "" {
-		baseURL = "http://localhost:3001"
+		baseURL = "http://localhost:"
 	}
 
 	startServer()
 }
 
 func startServer() {
+
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+
 	r := mux.NewRouter()
 
 	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
@@ -76,7 +82,7 @@ func startServer() {
 	r.HandleFunc("/home", homeHandler)
 
 	http.Handle("/", r)
-	http.ListenAndServe(":3001", nil)
+	http.ListenAndServe(":"+port, nil)
 }
 
 // redirectHandler takes an HTTP request and redirects to the main page

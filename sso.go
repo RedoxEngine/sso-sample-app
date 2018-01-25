@@ -79,7 +79,7 @@ func startServer() {
 		negroni.HandlerFunc(jwtMiddleware.HandlerWithNext),
 		negroni.Wrap(http.HandlerFunc(redirectHandler)),
 	))
-	r.HandleFunc("/home", homeHandler)
+	r.HandleFunc("/", homeHandler)
 
 	http.Handle("/", r)
 	http.ListenAndServe(":"+port, nil)
@@ -89,7 +89,7 @@ func startServer() {
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value("user").(*jwt.Token)
 	providerName := token.Claims.(jwt.MapClaims)["name"].(string)
-	http.Redirect(w, r, baseURL+"/home?auth="+providerName, 302)
+	http.Redirect(w, r, baseURL+"/?auth="+providerName, 302)
 }
 
 // homeHandler renders the html template with the query string parameters

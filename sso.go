@@ -1,6 +1,9 @@
 package main
 
 import (
+	"html/template"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
@@ -9,6 +12,9 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 )
+
+var templ *template.Template
+var baseURL = string(os.Getenv("BASE_URL"))
 
 // RedoxIds represents patient Identifiers
 type RedoxIds struct {
@@ -34,7 +40,20 @@ type RedoxCustomClaims struct {
 	jwt.StandardClaims
 }
 
+func check(err error) {
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
+}
+
 func main() {
+	homeTemplate, err := ioutil.ReadFile("./templates/index.tmpl")
+	check(err)
+	templ = template.Must(template.New("home").Parse(string(homeTemplate)))
+	if baseURL == "" {
+		baseURL = "http://localhost:3001"
+	}
 
 	startServer()
 }
@@ -54,13 +73,31 @@ func startServer() {
 		negroni.HandlerFunc(jwtMiddleware.HandlerWithNext),
 		negroni.Wrap(http.HandlerFunc(redirectHandler)),
 	))
+	r.HandleFunc("/home", homeHandler)
 
 	http.Handle("/", r)
 	http.ListenAndServe(":3001", nil)
 }
 
-// redirectHandler takes an HTTP request and redirects to a special place
+// redirectHandler takes an HTTP request and redirects to the main page
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
+	token := r.Context().Value("user").(*jwt.Token)
+	providerName := token.Claims.(jwt.MapClaims)["name"].(string)
+	http.Redirect(w, r, baseURL+"/home?auth="+providerName, 302)
+}
 
-	http.Redirect(w, r, "https://www.youtube.com/embed/dQw4w9WgXcQ", 302)
+// homeHandler renders the html template with the query string parameters
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	params := r.URL.Query()
+
+	data := struct {
+		Title string
+	}{
+		Title: params.Get("auth"),
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+	err := templ.Execute(w, data)
+	check(err)
 }

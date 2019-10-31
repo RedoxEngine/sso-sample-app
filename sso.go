@@ -82,6 +82,8 @@ func startServer() {
 	r.HandleFunc("/", homeHandler)
 
 	http.Handle("/", r)
+
+	log.Print("Listening on http://0.0.0.0:"+port+"/secure")
 	http.ListenAndServe(":"+port, nil)
 }
 
@@ -89,7 +91,7 @@ func startServer() {
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value("user").(*jwt.Token)
 	providerName := token.Claims.(jwt.MapClaims)["name"].(string)
-	http.Redirect(w, r, baseURL+"/?auth="+providerName, 302)
+	http.Redirect(w, r, baseURL+"/?auth="+providerName+"&json=", 302)
 }
 
 // homeHandler renders the html template with the query string parameters
@@ -98,8 +100,10 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Title string
+		JSON string
 	}{
 		Title: params.Get("auth"),
+		JSON: params.Get("json"),
 	}
 
 	w.WriteHeader(http.StatusOK)

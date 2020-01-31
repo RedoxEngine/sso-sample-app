@@ -9,3 +9,4 @@
 !heroku.yml
 !templates/*.tmpl 
 !Godeps/**
+!.circleci/config.yml

@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/sso-app",
+	"ImportPath": "github.com/RedoxEngine/sso-sample-app",
 	"GoVersion": "go1.9",
 	"GodepVersion": "v79",
 	"Deps": [
